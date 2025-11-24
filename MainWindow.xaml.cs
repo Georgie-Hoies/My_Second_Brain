@@ -20,6 +20,9 @@ namespace My_Second_Brain
         private readonly Stack<StrokeCollection> _redoStack = new Stack<StrokeCollection>(); // 重做历史堆栈
         private bool _isChangingStrokes = false; // 保护标志：防止在执行撤销/重做时，再次触发保存状态的逻辑
 
+        // 记录当前激活的工具按钮 (用于实现 OneNote 风格的二次点击弹出菜单)
+        private RadioButton? _activeToolButton;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -43,39 +46,106 @@ namespace My_Second_Brain
             PushToUndoStack();
         }
 
-        // 处理工具切换（笔、荧光笔、橡皮）
+        // 处理工具切换（笔、荧光笔、橡皮、文本）
         private void OnToolChanged(object sender, RoutedEventArgs e)
         {
             // 安全检查：确保发送者是 RadioButton 且 Tag 属性已设置
             if (sender is RadioButton rb && rb.Tag != null)
             {
-                // 使用 ! 告诉编译器 Tag 在此上下文中不为空
                 string toolType = rb.Tag.ToString()!;
 
-                // --- 新增功能：处理选择模式 ---
+                // --- OneNote 核心交互逻辑：二次点击橡皮擦呼出菜单 ---
+                if (toolType == "Eraser" && _activeToolButton == rb)
+                {
+                    if (rb.ContextMenu != null)
+                    {
+                        // 【修复】显式指定菜单的“锚点”为当前按钮
+                        rb.ContextMenu.PlacementTarget = rb;
+                        rb.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+
+                        // 强制打开
+                        rb.ContextMenu.IsOpen = true;
+                    }
+                    return;
+                }
+                // ------------------------------------------------
+
+                // 更新当前激活的按钮记录
+                _activeToolButton = rb;
+
+                // --- 1. 选择模式 ---
                 if (toolType == "Select")
                 {
-                    // 切换到选择模式 (OneNote 的核心功能之一)
-                    // 允许用户圈选墨迹进行移动或缩放
                     MainInkCanvas.EditingMode = InkCanvasEditingMode.Select;
-
-                    // 切换时最好清除一下之前的选中状态，避免残留
-                    // 【修复】(StrokeCollection) 解决二义性，null! (加感叹号) 消除空引用警告
                     MainInkCanvas.Select((StrokeCollection)null!);
                 }
-                // --- 原有逻辑下移，改为 else if ---
+                // --- 2. 文本模式 (v1.1.0 预留) ---
+                else if (toolType == "Text")
+                {
+                    // 暂时先设为 None，后续我们会在这里加点击生成文本框的逻辑
+                    MainInkCanvas.EditingMode = InkCanvasEditingMode.None;
+                }
+                // --- 3. 橡皮擦模式 (本次修改重点) ---
                 else if (toolType == "Eraser")
                 {
-                    // 切换到橡皮擦模式
-                    // EraseByStroke: 只要碰到笔划的一点，就删除整个笔划（类似 OneNote 的默认行为）
-                    MainInkCanvas.EditingMode = InkCanvasEditingMode.EraseByStroke;
+                    // 调用辅助方法来设置具体的擦除模式
+                    ApplyEraserMode();
                 }
+                // --- 4. 笔刷模式 ---
                 else
                 {
-                    // 切换回墨迹书写模式
                     MainInkCanvas.EditingMode = InkCanvasEditingMode.Ink;
-                    // 更新笔刷属性（传入 Pen 或 Highlighter）
                     UpdateDrawingAttributes(toolType);
+                }
+            }
+        }
+
+        // 【新增】处理橡皮擦菜单点击事件 (修复 CS1061 错误)
+        private void OnEraserMenuClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem clickedItem)
+            {
+                // 1. 实现菜单项单选逻辑 (互斥)：把其他选项的勾去掉
+                var menu = (ContextMenu)clickedItem.Parent;
+                foreach (MenuItem item in menu.Items.OfType<MenuItem>())
+                {
+                    item.IsChecked = (item == clickedItem);
+                }
+
+                // 2. 如果当前正在使用橡皮擦，立即应用新模式
+                if (ToolEraser.IsChecked == true)
+                {
+                    ApplyEraserMode();
+                }
+            }
+        }
+
+        // 辅助方法：应用当前的橡皮擦设置 (从菜单状态读取)
+        private void ApplyEraserMode()
+        {
+            if (MainInkCanvas == null || ToolEraser.ContextMenu == null) return;
+
+            // 遍历菜单，找到那个被打钩 (IsChecked) 的项
+            foreach (MenuItem item in ToolEraser.ContextMenu.Items.OfType<MenuItem>())
+            {
+                if (item.IsChecked && item.Tag != null)
+                {
+                    string mode = item.Tag.ToString()!;
+
+                    if (mode == "Stroke")
+                    {
+                        // 模式 A: 笔划擦除 (碰到即删)
+                        MainInkCanvas.EditingMode = InkCanvasEditingMode.EraseByStroke;
+                    }
+                    else if (mode == "Point")
+                    {
+                        // 模式 B: 点擦除 (标准橡皮)
+                        MainInkCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
+
+                        // 设置橡皮擦的大小 (你可以根据需要调整这个数值，这里设为 10x10)
+                        MainInkCanvas.EraserShape = new RectangleStylusShape(10, 10);
+                    }
+                    break; // 找到一个就够了
                 }
             }
         }
