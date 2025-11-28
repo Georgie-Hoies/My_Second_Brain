@@ -1,11 +1,26 @@
-﻿using Microsoft.Win32;
+﻿using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Interop; // 【新增】用于处理 Windows 系统底层消息 (如水平滚轮)
+using System.Windows.Interop;
+using System.Collections.Generic;
+using System.Linq;
+
+// 【关键修改】使用别名解决冲突 (修复所有 31 处命名冲突)
+using WinForms = System.Windows.Forms;
+using Drawing = System.Drawing;
+using Brush = System.Windows.Media.Brush;
+using Brushes = System.Windows.Media.Brushes;
+using Color = System.Windows.Media.Color;
+using Pen = System.Windows.Media.Pen;
+using Point = System.Windows.Point;
+using MessageBox = System.Windows.MessageBox;
+using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using MenuItem = System.Windows.Controls.MenuItem;
 
 namespace My_Second_Brain
 {
@@ -14,6 +29,7 @@ namespace My_Second_Brain
         // 状态变量：存储当前选中的颜色和笔触大小，以便在切换工具时恢复设置
         private Color _currentColor = Colors.Black;
         private double _currentSize = 4.0;
+        private double _eraserSize = 10.0; // 橡皮擦大小
 
         // --- 【新增】撤销/重做功能所需的字段 ---
         private readonly Stack<StrokeCollection> _undoStack = new Stack<StrokeCollection>(); // 撤销历史堆栈
@@ -21,7 +37,11 @@ namespace My_Second_Brain
         private bool _isChangingStrokes = false; // 保护标志：防止在执行撤销/重做时，再次触发保存状态的逻辑
 
         // 记录当前激活的工具按钮 (用于实现 OneNote 风格的二次点击弹出菜单)
-        private RadioButton? _activeToolButton;
+        private System.Windows.Controls.RadioButton? _activeToolButton;
+
+        // 【新增】记录当前的橡皮擦模式 (Stroke 或 Point)
+        // 修复 CS0103: The name '_eraserMode' does not exist
+        private System.Windows.Controls.InkCanvasEditingMode _eraserMode = System.Windows.Controls.InkCanvasEditingMode.EraseByStroke;
 
         public MainWindow()
         {
@@ -46,55 +66,49 @@ namespace My_Second_Brain
             PushToUndoStack();
         }
 
-        // 处理工具切换（笔、荧光笔、橡皮、文本）
+        // ---------------------------------------------------------
+        // 【核心】沉浸式分级菜单状态机
+        // ---------------------------------------------------------
+
+        // 1. 工具切换逻辑 (替换原有的 OnToolChanged)
         private void OnToolChanged(object sender, RoutedEventArgs e)
         {
             // 安全检查：确保发送者是 RadioButton 且 Tag 属性已设置
-            if (sender is RadioButton rb && rb.Tag != null)
+            if (sender is System.Windows.Controls.RadioButton rb && rb.Tag != null)
             {
                 string toolType = rb.Tag.ToString()!;
 
                 // --- OneNote 核心交互逻辑：二次点击橡皮擦呼出菜单 ---
-                if (toolType == "Eraser" && _activeToolButton == rb)
+                if (toolType != "Select" && toolType != "Text" && _activeToolButton == rb)
                 {
                     if (rb.ContextMenu != null)
                     {
-                        // 【修复】显式指定菜单的“锚点”为当前按钮
                         rb.ContextMenu.PlacementTarget = rb;
                         rb.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
-
-                        // 强制打开
                         rb.ContextMenu.IsOpen = true;
                     }
-                    return;
+                    return; // 既然只是打开菜单，就不需要重复执行下面的切换逻辑了
                 }
-                // ------------------------------------------------
 
-                // 更新当前激活的按钮记录
-                _activeToolButton = rb;
+                _activeToolButton = rb; // 记录当前工具，供后续逻辑使用
 
-                // --- 1. 选择模式 ---
+                // 切换画布模式
                 if (toolType == "Select")
                 {
-                    MainInkCanvas.EditingMode = InkCanvasEditingMode.Select;
-                    MainInkCanvas.Select((StrokeCollection)null!);
+                    MainInkCanvas.EditingMode = System.Windows.Controls.InkCanvasEditingMode.Select;
+                    MainInkCanvas.Select((System.Windows.Ink.StrokeCollection)null!);
                 }
-                // --- 2. 文本模式 (v1.1.0 预留) ---
                 else if (toolType == "Text")
                 {
-                    // 暂时先设为 None，后续我们会在这里加点击生成文本框的逻辑
-                    MainInkCanvas.EditingMode = InkCanvasEditingMode.None;
+                    MainInkCanvas.EditingMode = System.Windows.Controls.InkCanvasEditingMode.None;
                 }
-                // --- 3. 橡皮擦模式 (本次修改重点) ---
                 else if (toolType == "Eraser")
                 {
-                    // 调用辅助方法来设置具体的擦除模式
-                    ApplyEraserMode();
+                    ApplyEraserMode(); // 应用当前的橡皮设置
                 }
-                // --- 4. 笔刷模式 ---
-                else
+                else // Pen, Highlighter
                 {
-                    MainInkCanvas.EditingMode = InkCanvasEditingMode.Ink;
+                    MainInkCanvas.EditingMode = System.Windows.Controls.InkCanvasEditingMode.Ink;
                     UpdateDrawingAttributes(toolType);
                 }
             }
@@ -106,14 +120,14 @@ namespace My_Second_Brain
             if (sender is MenuItem clickedItem)
             {
                 // 1. 实现菜单项单选逻辑 (互斥)：把其他选项的勾去掉
-                var menu = (ContextMenu)clickedItem.Parent;
+                var menu = (System.Windows.Controls.ContextMenu)clickedItem.Parent;
                 foreach (MenuItem item in menu.Items.OfType<MenuItem>())
                 {
                     item.IsChecked = (item == clickedItem);
                 }
 
                 // 2. 如果当前正在使用橡皮擦，立即应用新模式
-                if (ToolEraser.IsChecked == true)
+                if (_activeToolButton != null && _activeToolButton.Tag?.ToString() == "Eraser" && _activeToolButton.IsChecked == true)
                 {
                     ApplyEraserMode();
                 }
@@ -123,10 +137,16 @@ namespace My_Second_Brain
         // 辅助方法：应用当前的橡皮擦设置 (从菜单状态读取)
         private void ApplyEraserMode()
         {
-            if (MainInkCanvas == null || ToolEraser.ContextMenu == null) return;
+            System.Windows.Controls.ContextMenu? menu = null;
+            if (_activeToolButton != null && _activeToolButton.Tag?.ToString() == "Eraser")
+            {
+                menu = _activeToolButton.ContextMenu;
+            }
+
+            if (MainInkCanvas == null || menu == null) return;
 
             // 遍历菜单，找到那个被打钩 (IsChecked) 的项
-            foreach (MenuItem item in ToolEraser.ContextMenu.Items.OfType<MenuItem>())
+            foreach (MenuItem item in menu.Items.OfType<MenuItem>())
             {
                 if (item.IsChecked && item.Tag != null)
                 {
@@ -134,16 +154,14 @@ namespace My_Second_Brain
 
                     if (mode == "Stroke")
                     {
-                        // 模式 A: 笔划擦除 (碰到即删)
-                        MainInkCanvas.EditingMode = InkCanvasEditingMode.EraseByStroke;
+                        MainInkCanvas.EditingMode = System.Windows.Controls.InkCanvasEditingMode.EraseByStroke;
                     }
                     else if (mode == "Point")
                     {
-                        // 模式 B: 点擦除 (标准橡皮)
-                        MainInkCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
+                        MainInkCanvas.EditingMode = System.Windows.Controls.InkCanvasEditingMode.EraseByPoint;
 
                         // 设置橡皮擦的大小 (你可以根据需要调整这个数值，这里设为 10x10)
-                        MainInkCanvas.EraserShape = new RectangleStylusShape(10, 10);
+                        MainInkCanvas.EraserShape = new System.Windows.Ink.RectangleStylusShape(_eraserSize, _eraserSize);
                     }
                     break; // 找到一个就够了
                 }
@@ -153,89 +171,180 @@ namespace My_Second_Brain
         // 当用户勾选或取消“书法模式”时触发
         private void OnAttributeChanged(object sender, RoutedEventArgs e)
         {
-            // 如果当前选中的是笔或荧光笔，立即刷新一下属性
-            if (ToolPen.IsChecked == true) UpdateDrawingAttributes("Pen");
-            else if (ToolHighlighter.IsChecked == true) UpdateDrawingAttributes("Highlighter");
+            if (_activeToolButton?.Tag?.ToString() == "Pen") UpdateDrawingAttributes("Pen");
+            else if (_activeToolButton?.Tag?.ToString() == "Highlighter") UpdateDrawingAttributes("Highlighter");
         }
 
-        // 核心方法：更新画笔属性（颜色、大小、样式）
+        // 核心方法：更新画笔属性
         private void UpdateDrawingAttributes(string toolType)
         {
-            // 防止在组件未完全加载前调用导致空引用
             if (MainInkCanvas == null) return;
 
-            // 创建新的绘图属性对象
             DrawingAttributes attributes = new DrawingAttributes();
-
-            // 通用设置
             attributes.Color = _currentColor;
             attributes.Width = _currentSize;
             attributes.Height = _currentSize;
-            attributes.FitToCurve = true; // 开启平滑曲线，让笔迹更圆润
+            attributes.FitToCurve = true;
 
-            // --- 书法逻辑开始 ---
-            // 只有当工具是 "Pen" 且 "书法模式" 被勾选时才执行
-            if (toolType == "Pen" && CheckCalligraphy.IsChecked == true)
+            // 查找 CheckCalligraphy 状态 (需确保 XAML 中有 x:Name="CheckCalligraphy")
+            bool isCalligraphy = false;
+            object chk = this.FindName("CheckCalligraphy");
+            if (chk is System.Windows.Controls.CheckBox c && c.IsChecked == true)
             {
-                // 【知识点】Matrix (矩阵变换)
-                // 想象笔尖原本是一个圆球。
-                // 1. Scale(1.0, 0.3): 我们把它压扁，X轴不变，Y轴变成原来的 30%。它变成了扁平的椭圆。
-                // 2. Rotate(45): 我们把这个扁平的笔尖旋转 45 度。
-                // 这样写出来的线条，横细竖粗，就像钢笔一样。
-                Matrix matrix = new Matrix();
+                isCalligraphy = true;
+            }
+
+            if (toolType == "Pen" && isCalligraphy)
+            {
+                System.Windows.Media.Matrix matrix = new System.Windows.Media.Matrix();
                 matrix.Rotate(45);
                 matrix.Scale(1.0, 0.3);
-
-                attributes.StylusTipTransform = matrix; // 应用变形
-                attributes.StylusTip = StylusTip.Ellipse; // 必须是椭圆模式才生效
+                attributes.StylusTipTransform = matrix;
+                attributes.StylusTip = System.Windows.Ink.StylusTip.Ellipse;
             }
-            // --- 书法逻辑结束 ---
 
-            // 工具特定设置
             if (toolType == "Highlighter")
             {
-                // 荧光笔设置
-                attributes.IsHighlighter = true; // 关键：开启半透明混合模式
-                attributes.StylusTip = StylusTip.Rectangle; // 笔尖设为方形
-                attributes.Width = 20; // 荧光笔默认较宽
-                attributes.Height = 20;
-
-                // 如果当前选的是黑色，荧光笔会看不见，强制改为黄色
-                if (_currentColor == Colors.Black)
-                    attributes.Color = Colors.Yellow;
+                attributes.IsHighlighter = true;
+                attributes.StylusTip = System.Windows.Ink.StylusTip.Rectangle;
+                attributes.Width = 20; attributes.Height = 20;
+                if (_currentColor == Colors.Black) attributes.Color = Colors.Yellow;
             }
-            else if (CheckCalligraphy.IsChecked == false) // 如果没开书法模式
+            else if (!isCalligraphy)
             {
-                // 普通钢笔设置
-                attributes.IsHighlighter = false; // 不透明
-                attributes.StylusTip = StylusTip.Ellipse; // 恢复成普通圆点笔尖
+                attributes.IsHighlighter = false;
+                attributes.StylusTip = System.Windows.Ink.StylusTip.Ellipse;
             }
-
-            // 将新属性应用到画布
             MainInkCanvas.DefaultDrawingAttributes = attributes;
         }
 
         // 处理颜色点击事件
-        private void OnColorPicked(object sender, MouseButtonEventArgs e)
+        private void OnColorPicked(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (sender is Border border && border.Background is SolidColorBrush brush)
+            if (sender is Border border && border.Background is System.Windows.Media.SolidColorBrush brush)
             {
                 _currentColor = brush.Color;
-
-                // 选中颜色后，根据当前是否选中荧光笔来刷新属性
-                if (ToolHighlighter.IsChecked == true) UpdateDrawingAttributes("Highlighter");
+                if (_activeToolButton?.Tag?.ToString() == "Highlighter") UpdateDrawingAttributes("Highlighter");
                 else UpdateDrawingAttributes("Pen");
             }
         }
 
         // 处理滑块拖动事件，实时调整笔触大小
-        private void OnSizeChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void OnSizeChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
             _currentSize = e.NewValue;
 
-            // 同样需要根据当前工具刷新属性
-            if (ToolHighlighter.IsChecked == true) UpdateDrawingAttributes("Highlighter");
+            if (_activeToolButton?.Tag?.ToString() == "Highlighter") UpdateDrawingAttributes("Highlighter");
             else UpdateDrawingAttributes("Pen");
+        }
+
+        // 【新增】处理固定粗细选择 (0.25mm - 3.5mm)
+        private void OnThicknessChanged(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.RadioButton rb && rb.Tag != null)
+            {
+                // Tag 存储的是 UI 上圆点的直径 (4, 6, 8...)
+                // 我们需要把它映射回实际的笔触粗细 (像素)
+
+                double dotSize = double.Parse(rb.Tag.ToString()!);
+
+                // 简单的映射逻辑：
+                // UI圆点 4   -> 笔触 1px   (0.25mm)
+                // UI圆点 6   -> 笔触 1.5px (0.35mm)
+                // UI圆点 8   -> 笔触 2px   (0.5mm)
+                // UI圆点 12  -> 笔触 4px   (1mm)
+                // UI圆点 16  -> 笔触 8px   (2mm)
+                // UI圆点 20  -> 笔触 14px  (3.5mm)
+
+                // 简单公式模拟：
+                if (dotSize <= 4) _currentSize = 1.0;
+                else if (dotSize <= 6) _currentSize = 1.5;
+                else if (dotSize <= 8) _currentSize = 2.0;
+                else if (dotSize <= 12) _currentSize = 4.0;
+                else if (dotSize <= 16) _currentSize = 8.0;
+                else _currentSize = 14.0;
+
+                // 立即刷新属性
+                if (_activeToolButton?.Tag?.ToString() == "Highlighter")
+                    UpdateDrawingAttributes("Highlighter");
+                else
+                    UpdateDrawingAttributes("Pen");
+            }
+        }
+
+        // 处理橡皮擦模式单选框变化
+        private void OnEraserModeRadioChanged(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.RadioButton rb && rb.Tag != null)
+            {
+                // 更新状态变量
+                if (rb.Tag.ToString() == "Stroke")
+                    _eraserMode = System.Windows.Controls.InkCanvasEditingMode.EraseByStroke;
+                else
+                    _eraserMode = System.Windows.Controls.InkCanvasEditingMode.EraseByPoint;
+
+                // 如果当前工具是橡皮，立即应用
+                if (_activeToolButton?.Tag?.ToString() == "Eraser")
+                    UpdateEraserSettings();
+            }
+        }
+
+        // 视图切换：返回 L3 工具列表 (新增方法，绑定到 Back 按钮)
+        // 此方法在当前 Rich Flyout 模式中已无用，但为防止 XAML 报错，需保留定义
+        private void OnBackToToolsClick(object sender, RoutedEventArgs e)
+        {
+            // 保持方法定义，避免 XAML 找不到 Click 事件目标
+        }
+
+        // 橡皮擦大小滑块变化
+        private void OnEraserSizeChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
+        {
+            _eraserSize = e.NewValue;
+            UpdateEraserSettings();
+        }
+
+        // 辅助方法：实时应用橡皮擦设置 (模式 + 大小)
+        private void UpdateEraserSettings()
+        {
+            if (MainInkCanvas == null) return;
+
+            // 直接使用变量状态，而不是去查 UI 控件，更稳定
+            if (_eraserMode == System.Windows.Controls.InkCanvasEditingMode.EraseByStroke)
+            {
+                MainInkCanvas.EditingMode = System.Windows.Controls.InkCanvasEditingMode.EraseByStroke;
+            }
+            else
+            {
+                MainInkCanvas.EditingMode = System.Windows.Controls.InkCanvasEditingMode.EraseByPoint;
+                MainInkCanvas.EraserShape = new System.Windows.Ink.RectangleStylusShape(_eraserSize, _eraserSize);
+            }
+        }
+
+        // ---------------------------------------------------------
+        // 【新增】高级功能支持 (HEX取色器 / 橡皮实时调整)
+        // ---------------------------------------------------------
+
+        // 调用 Windows 系统调色板 (需引用 System.Windows.Forms)
+        private void OnMoreColorsClick(object sender, RoutedEventArgs e)
+        {
+            // 使用别名 WinForms 来实例化
+            WinForms.ColorDialog colorDialog = new WinForms.ColorDialog();
+            colorDialog.AllowFullOpen = true; // 允许展开自定义颜色 (RGB/HEX)
+            colorDialog.FullOpen = true;      // 默认展开
+
+            // 使用别名 WinForms 来判断结果
+            if (colorDialog.ShowDialog() == WinForms.DialogResult.OK)
+            {
+                // 这里的 color 是 WinForms 的 (System.Drawing.Color)
+                Drawing.Color formColor = colorDialog.Color;
+
+                // 手动转换为 WPF 的颜色 (System.Windows.Media.Color)
+                _currentColor = System.Windows.Media.Color.FromArgb(formColor.A, formColor.R, formColor.G, formColor.B);
+
+                // 立即应用新颜色
+                if (_activeToolButton?.Tag?.ToString() == "Highlighter") UpdateDrawingAttributes("Highlighter");
+                else UpdateDrawingAttributes("Pen");
+            }
         }
 
         // 【新增】辅助方法：保存当前墨迹状态到撤销堆栈
@@ -304,7 +413,8 @@ namespace My_Second_Brain
         // 保存功能：将墨迹保存为 .isf (Ink Serialized Format) 文件
         private void OnSaveClick(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveDialog = new SaveFileDialog();
+            // 【修复】使用 WPF 原生 SaveFileDialog (需要加上 Microsoft.Win32 前缀以防二义性)
+            Microsoft.Win32.SaveFileDialog saveDialog = new Microsoft.Win32.SaveFileDialog();
             saveDialog.Filter = "Ink File (*.isf)|*.isf"; // 文件过滤器
             saveDialog.FileName = "My_Notes";
 
@@ -329,7 +439,8 @@ namespace My_Second_Brain
         // 加载功能：读取 .isf 文件并还原到画布
         private void OnLoadClick(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openDialog = new OpenFileDialog();
+            // 【修复】使用 WPF 原生 OpenFileDialog
+            Microsoft.Win32.OpenFileDialog openDialog = new Microsoft.Win32.OpenFileDialog();
             openDialog.Filter = "Ink File (*.isf)|*.isf";
 
             if (openDialog.ShowDialog() == true)
@@ -354,7 +465,8 @@ namespace My_Second_Brain
         }
 
         // 【新增】处理键盘快捷键 (Ctrl+Z 撤销, Ctrl+Y 重做)
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+        // 【修复】显式指定 System.Windows.Input.KeyEventArgs 以避免二义性
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             // 检查 Ctrl 键是否被按住
             if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
@@ -379,7 +491,8 @@ namespace My_Second_Brain
         {
             // 安全检查
             if (MainInkCanvas == null) return;
-            if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+            // 【修复】使用 WPF 的 ComboBox
+            if (sender is System.Windows.Controls.ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
             {
                 string style = item.Tag.ToString()!;
 
