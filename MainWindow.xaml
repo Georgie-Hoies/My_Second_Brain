@@ -10,319 +10,347 @@
         FontFamily="Segoe UI" FontSize="14"
         Background="{DynamicResource AppBackground}">
 
-	<Window.Resources>
-		<SolidColorBrush x:Key="AppBackground" Color="#F0F3F9"/>
-		<SolidColorBrush x:Key="PanelBackground" Color="#FFFFFF"/>
-		<SolidColorBrush x:Key="AccentColor" Color="#5B67C6"/>
-		<SolidColorBrush x:Key="TextPrimary" Color="#333333"/>
-		<SolidColorBrush x:Key="TextSecondary" Color="#777777"/>
-		<SolidColorBrush x:Key="HoverBackground" Color="#F2F2F2"/>
-		<SolidColorBrush x:Key="PressedBackground" Color="#E5E5E5"/>
-		<Style x:Key="ModernButtonStyle" TargetType="Button">
-			<Setter Property="Background" Value="Transparent"/>
-			<Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-			<Setter Property="Padding" Value="12,8"/>
-			<Setter Property="Margin" Value="0,0,8,0"/>
-			<Setter Property="BorderThickness" Value="0"/>
-			<Setter Property="FontSize" Value="14"/>
-			<Setter Property="Cursor" Value="Hand"/>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="Button">
-						<Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6" SnapsToDevicePixels="True">
-							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						</Border>
-						<ControlTemplate.Triggers>
-							<Trigger Property="IsMouseOver" Value="True">
-								<Setter TargetName="border" Property="Background" Value="{StaticResource HoverBackground}"/>
-							</Trigger>
-							<Trigger Property="IsPressed" Value="True">
-								<Setter TargetName="border" Property="Background" Value="{StaticResource PressedBackground}"/>
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
+    <Window.Resources>
+        <SolidColorBrush x:Key="AppBackground" Color="#F0F3F9"/> <SolidColorBrush x:Key="PanelBackground" Color="#FFFFFF"/> <SolidColorBrush x:Key="AccentColor" Color="#5B67C6"/> <SolidColorBrush x:Key="TextPrimary" Color="#333333"/> <SolidColorBrush x:Key="TextSecondary" Color="#777777"/> <SolidColorBrush x:Key="HoverBackground" Color="#F2F2F2"/> <SolidColorBrush x:Key="PressedBackground" Color="#E5E5E5"/> <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6" SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBackground}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource PressedBackground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-		<Style TargetType="GroupBox">
-			<Setter Property="BorderThickness" Value="0"/>
-			<Setter Property="Margin" Value="0,0,20,0"/>
-			<Setter Property="HeaderTemplate">
-				<Setter.Value>
-					<DataTemplate>
-						<TextBlock Text="{Binding}" FontWeight="Bold" Foreground="{StaticResource TextSecondary}"
+        <Style TargetType="GroupBox">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Margin" Value="0,0,20,0"/>
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" 
                                    FontSize="12" Margin="0,0,0,5" Opacity="0.6"/>
-					</DataTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-		<Style TargetType="TabItem">
-			<Setter Property="FontSize" Value="15"/>
-			<Setter Property="FontWeight" Value="SemiBold"/>
-			<Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-			<Setter Property="Padding" Value="20,12"/>
-			<Setter Property="Cursor" Value="Hand"/>
-			<Setter Property="Background" Value="Transparent"/>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="TabItem">
-						<Grid>
-							<Border x:Name="Border" Background="Transparent" BorderBrush="Transparent" BorderThickness="0,0,0,3" Margin="0,0,5,0">
-								<ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="10,2"/>
-							</Border>
-						</Grid>
-						<ControlTemplate.Triggers>
-							<Trigger Property="IsSelected" Value="True">
-								<Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentColor}"/>
-								<Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
-							</Trigger>
-							<Trigger Property="IsMouseOver" Value="True">
-								<Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
+        <Style TargetType="TabItem">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid>
+                            <Border x:Name="Border" Background="Transparent" BorderBrush="Transparent" BorderThickness="0,0,0,3" Margin="0,0,5,0">
+                                <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="10,2"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-		<Style x:Key="ToolRadioButtonStyle" TargetType="RadioButton">
-			<Setter Property="Background" Value="Transparent"/>
-			<Setter Property="Padding" Value="10,6"/>
-			<Setter Property="Margin" Value="0,0,5,0"/>
-			<Setter Property="Cursor" Value="Hand"/>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="RadioButton">
-						<Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6" BorderBrush="{StaticResource AccentColor}" BorderThickness="0">
-							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
-						</Border>
-						<ControlTemplate.Triggers>
-							<Trigger Property="IsChecked" Value="True">
-								<Setter TargetName="border" Property="Background" Value="#E0E6F8"/>
-								<Setter TargetName="border" Property="BorderThickness" Value="0"/>
-								<Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
-								<Setter Property="FontWeight" Value="Bold"/>
-							</Trigger>
-							<Trigger Property="IsMouseOver" Value="True">
-								<Setter TargetName="border" Property="Background" Value="{StaticResource HoverBackground}"/>
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
+        <Style x:Key="ToolRadioButtonStyle" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6" BorderBrush="{StaticResource AccentColor}" BorderThickness="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#E0E6F8"/>
+                                <Setter TargetName="border" Property="BorderThickness" Value="0"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource HoverBackground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-		<Style x:Key="ThicknessDotStyle" TargetType="RadioButton">
-			<Setter Property="GroupName" Value="PenSize"/>
-			<Setter Property="Width" Value="30"/>
-			<Setter Property="Height" Value="30"/>
-			<Setter Property="Margin" Value="2,0"/>
-			<Setter Property="Cursor" Value="Hand"/>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="RadioButton">
-						<Grid Background="Transparent">
-							<Border x:Name="OuterRing" Width="28" Height="28" CornerRadius="14"
+        <Style x:Key="ThicknessDotStyle" TargetType="RadioButton">
+            <Setter Property="GroupName" Value="PenSize"/>
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Grid Background="Transparent">
+                            <Border x:Name="OuterRing" Width="28" Height="28" CornerRadius="14" 
                                     BorderBrush="{StaticResource AccentColor}" BorderThickness="2" Visibility="Collapsed"/>
 
-							<Ellipse x:Name="Dot"
-                                     Width="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
-                                     Height="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
-                                     Fill="#333333"
+                            <Ellipse x:Name="Dot" 
+                                     Width="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" 
+                                     Height="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" 
+                                     Fill="#333333" 
                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						</Grid>
-						<ControlTemplate.Triggers>
-							<Trigger Property="IsChecked" Value="True">
-								<Setter TargetName="OuterRing" Property="Visibility" Value="Visible"/>
-							</Trigger>
-							<Trigger Property="IsMouseOver" Value="True">
-								<Setter TargetName="Dot" Property="Fill" Value="#666666"/>
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-	</Window.Resources>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="OuterRing" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Dot" Property="Fill" Value="#666666"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-	<Grid Background="{StaticResource AppBackground}">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
-		</Grid.RowDefinitions>
+        <Style TargetType="ContextMenu">
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Grid.IsSharedSizeScope" Value="true" />
+            <Setter Property="HasDropShadow" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border x:Name="Border" Background="{StaticResource PanelBackground}" BorderThickness="1" BorderBrush="#EFEFEF" CornerRadius="8" Padding="5">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="25" ShadowDepth="5" Color="#000000" Opacity="0.15"/>
+                            </Border.Effect>
+                            <ItemsPresenter Margin="5"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-		<Border Grid.Row="0" Background="{StaticResource PanelBackground}" Padding="5,5,5,0">
-			<Border.Effect>
-				<DropShadowEffect Color="#DDDDDD" BlurRadius="15" ShadowDepth="2" Direction="270" Opacity="0.5"/>
-			</Border.Effect>
+        <Style x:Key="MenuLabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,5,0,5"/>
+        </Style>
 
-			<TabControl Background="Transparent" BorderThickness="0" Margin="0">
+    </Window.Resources>
 
-				<TabItem Header="Home">
-					<StackPanel Orientation="Horizontal" Margin="10,12" VerticalAlignment="Center">
+    <Grid Background="{StaticResource AppBackground}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-						<GroupBox Header="History">
-							<StackPanel Orientation="Horizontal">
-								<Button Content="↩️ Undo" ToolTip="Ctrl+Z" Click="OnUndoClick" Style="{StaticResource ModernButtonStyle}"/>
-								<Button Content="↪️ Redo" ToolTip="Ctrl+Y" Click="OnRedoClick" Style="{StaticResource ModernButtonStyle}"/>
-							</StackPanel>
-						</GroupBox>
+        <Border Grid.Row="0" Background="{StaticResource PanelBackground}" Padding="5,5,5,0">
+            <Border.Effect>
+                <DropShadowEffect Color="#DDDDDD" BlurRadius="15" ShadowDepth="2" Direction="270" Opacity="0.5"/>
+            </Border.Effect>
 
-						<Rectangle Width="1" Height="24" Fill="#EEEEEE" Margin="0,0,20,0" VerticalAlignment="Center"/>
+            <TabControl Background="Transparent" BorderThickness="0" Margin="0">
 
-						<GroupBox Header="File">
-							<StackPanel Orientation="Horizontal">
-								<Button Content="💾 Save" Click="OnSaveClick" Style="{StaticResource ModernButtonStyle}"/>
-								<Button Content="📂 Load" Click="OnLoadClick" Style="{StaticResource ModernButtonStyle}"/>
-								<Button Content="🗑️ Clear" Click="OnClearCanvas" Style="{StaticResource ModernButtonStyle}" Foreground="#FF453A"/>
-							</StackPanel>
-						</GroupBox>
+                <TabItem Header="Home">
+                    <StackPanel Orientation="Horizontal" Margin="10,12" VerticalAlignment="Center">
 
-					</StackPanel>
-				</TabItem>
+                        <GroupBox Header="HISTORY">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="↩️ Undo" ToolTip="Ctrl+Z" Click="OnUndoClick" Style="{StaticResource ModernButtonStyle}"/>
+                                <Button Content="↪️ Redo" ToolTip="Ctrl+Y" Click="OnRedoClick" Style="{StaticResource ModernButtonStyle}"/>
+                            </StackPanel>
+                        </GroupBox>
 
-				<TabItem Header="Draw" IsSelected="True">
-					<ScrollViewer x:Name="ToolbarScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" PanningMode="HorizontalOnly" Style="{x:Null}">
-						<StackPanel Orientation="Horizontal" Margin="10,12" VerticalAlignment="Center">
-							<GroupBox Header="Tools">
-								<StackPanel Orientation="Horizontal">
+                        <Rectangle Width="1" Height="24" Fill="#EEEEEE" Margin="0,0,20,0" VerticalAlignment="Center"/>
 
-									<RadioButton x:Name="ToolSelect" Content="🖐️ Select" GroupName="Tools"
-                                                 Click="OnToolChanged" Tag="Select"
+                        <GroupBox Header="FILE">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="💾 Save" Click="OnSaveClick" Style="{StaticResource ModernButtonStyle}"/>
+                                <Button Content="📂 Load" Click="OnLoadClick" Style="{StaticResource ModernButtonStyle}"/>
+                                <Button Content="🗑️ Clear" Click="OnClearCanvas" Style="{StaticResource ModernButtonStyle}" Foreground="#FF453A"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                    </StackPanel>
+                </TabItem>
+
+                <TabItem Header="Draw" IsSelected="True">
+                    <ScrollViewer x:Name="ToolbarScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" PanningMode="HorizontalOnly" Style="{x:Null}">
+                        <StackPanel Orientation="Horizontal" Margin="10,12" VerticalAlignment="Center">
+                            <GroupBox Header="TOOLS">
+                                <StackPanel Orientation="Horizontal">
+
+                                    <RadioButton x:Name="ToolSelect" Content="🖐️ Select" GroupName="Tools" 
+                                                 Click="OnToolChanged" Tag="Select" 
                                                  Style="{StaticResource ToolRadioButtonStyle}"/>
 
-									<RadioButton x:Name="ToolText" Content="🔤 Text" GroupName="Tools"
-                                                 Click="OnToolChanged" Tag="Text"
+                                    <RadioButton x:Name="ToolText" Content="🔤 Text" GroupName="Tools" 
+                                                 Click="OnToolChanged" Tag="Text" 
                                                  Style="{StaticResource ToolRadioButtonStyle}"/>
 
-									<RadioButton x:Name="ToolPen" GroupName="Tools" IsChecked="True"
-                                                 Click="OnToolChanged" Tag="Pen"
-                                                 ToolTip="Click again to open settings"
+                                    <RadioButton x:Name="ToolPen" GroupName="Tools" IsChecked="True" 
+                                                 Click="OnToolChanged" Tag="Pen" 
+                                                 ToolTip="Click again to open settings" 
                                                  Style="{StaticResource ToolRadioButtonStyle}">
-										<RadioButton.Content>
-											<StackPanel Orientation="Horizontal">
-												<TextBlock Text="🖊️ Pen"/>
-												<Path Data="M 0,0 L 3,3 L 6,0" Stroke="#999" StrokeThickness="1" Margin="6,4,0,0" VerticalAlignment="Center"/>
-											</StackPanel>
-										</RadioButton.Content>
+                                        <RadioButton.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="🖊️ Pen"/>
+                                                <Path Data="M 0,0 L 3,3 L 6,0" Stroke="#999" StrokeThickness="1" Margin="6,4,0,0" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </RadioButton.Content>
 
-										<RadioButton.ContextMenu>
-											<ContextMenu>
-												<GroupBox Header="Pen Properties" Padding="10" BorderThickness="0">
-													<StackPanel>
-														<StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-															<Border Width="24" Height="24" CornerRadius="12" Background="Black" Margin="0,0,8,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Black"/>
-															<Border Width="24" Height="24" CornerRadius="12" Background="#FF3B30" Margin="0,0,8,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Red"/>
-															<Border Width="24" Height="24" CornerRadius="12" Background="#007AFF" Margin="0,0,8,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Blue"/>
-															<Border Width="24" Height="24" CornerRadius="12" Background="#34C759" Margin="0,0,15,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Green"/>
-															<Button Content="🎨" Click="OnMoreColorsClick" Width="24" Height="24" Background="White" BorderBrush="#DDDDDD" Cursor="Hand" ToolTip="Custom Color"/>
-														</StackPanel>
+                                        <RadioButton.ContextMenu>
+                                            <ContextMenu>
+                                                <GroupBox Header="Pen Properties" Padding="10,5" BorderThickness="0" Margin="0">
+                                                    <StackPanel>
+                                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                                            <Border Width="24" Height="24" CornerRadius="12" Background="Black" Margin="0,0,8,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Black"/>
+                                                            <Border Width="24" Height="24" CornerRadius="12" Background="#FF3B30" Margin="0,0,8,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Red"/>
+                                                            <Border Width="24" Height="24" CornerRadius="12" Background="#007AFF" Margin="0,0,8,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Blue"/>
+                                                            <Border Width="24" Height="24" CornerRadius="12" Background="#34C759" Margin="0,0,15,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Green"/>
+                                                            <Button Content="🎨" Click="OnMoreColorsClick" Width="24" Height="24" Background="#F0F0F0" BorderThickness="0" Cursor="Hand" ToolTip="Custom Color">
+                                                                <Button.Template>
+                                                                    <ControlTemplate TargetType="Button">
+                                                                        <Border CornerRadius="12" Background="{TemplateBinding Background}">
+                                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                        </Border>
+                                                                    </ControlTemplate>
+                                                                </Button.Template>
+                                                            </Button>
+                                                        </StackPanel>
 
-														<TextBlock Text="Thickness" Foreground="#666666" FontSize="11" Margin="2,0,0,5"/>
-														<StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-															<RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="4" Click="OnThicknessChanged" ToolTip="0.25mm"/>
-															<RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="6" Click="OnThicknessChanged" ToolTip="0.35mm"/>
-															<RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="8" Click="OnThicknessChanged" ToolTip="0.5mm"/>
-															<RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="12" Click="OnThicknessChanged" IsChecked="True" ToolTip="1mm"/>
-															<RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="16" Click="OnThicknessChanged" ToolTip="2mm"/>
-															<RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="20" Click="OnThicknessChanged" ToolTip="3.5mm"/>
-														</StackPanel>
+                                                        <TextBlock Text="Thickness" Style="{StaticResource MenuLabelStyle}"/>
+                                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                                            <RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="4" Click="OnThicknessChanged" ToolTip="0.25mm"/>
+                                                            <RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="6" Click="OnThicknessChanged" ToolTip="0.35mm"/>
+                                                            <RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="8" Click="OnThicknessChanged" ToolTip="0.5mm"/>
+                                                            <RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="12" Click="OnThicknessChanged" IsChecked="True" ToolTip="1mm"/>
+                                                            <RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="16" Click="OnThicknessChanged" ToolTip="2mm"/>
+                                                            <RadioButton Style="{StaticResource ThicknessDotStyle}" Tag="20" Click="OnThicknessChanged" ToolTip="3.5mm"/>
+                                                        </StackPanel>
 
-														<CheckBox x:Name="CheckCalligraphy" Content="✒️ Calligraphy Mode" Checked="OnAttributeChanged" Unchecked="OnAttributeChanged" FontSize="12" Cursor="Hand"/>
-													</StackPanel>
-												</GroupBox>
-											</ContextMenu>
-										</RadioButton.ContextMenu>
-									</RadioButton>
+                                                        <CheckBox x:Name="CheckCalligraphy" Content="✒️ Calligraphy Mode" Checked="OnAttributeChanged" Unchecked="OnAttributeChanged" FontSize="12" Cursor="Hand" Margin="0,5,0,0"/>
+                                                    </StackPanel>
+                                                </GroupBox>
+                                            </ContextMenu>
+                                        </RadioButton.ContextMenu>
+                                    </RadioButton>
 
-									<RadioButton x:Name="ToolHighlighter" GroupName="Tools"
-                                                 Click="OnToolChanged" Tag="Highlighter"
-                                                 ToolTip="Click again to open settings"
+                                    <RadioButton x:Name="ToolHighlighter" GroupName="Tools" 
+                                                 Click="OnToolChanged" Tag="Highlighter" 
+                                                 ToolTip="Click again to open settings" 
                                                  Style="{StaticResource ToolRadioButtonStyle}">
-										<RadioButton.Content>
-											<StackPanel Orientation="Horizontal">
-												<TextBlock Text="🖍️ Highlighter"/>
-												<Path Data="M 0,0 L 3,3 L 6,0" Stroke="#999" StrokeThickness="1" Margin="6,4,0,0" VerticalAlignment="Center"/>
-											</StackPanel>
-										</RadioButton.Content>
+                                        <RadioButton.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="🖍️ Highlighter"/>
+                                                <Path Data="M 0,0 L 3,3 L 6,0" Stroke="#999" StrokeThickness="1" Margin="6,4,0,0" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </RadioButton.Content>
 
-										<RadioButton.ContextMenu>
-											<ContextMenu>
-												<GroupBox Header="Highlighter Properties" Padding="5" BorderThickness="0">
-													<StackPanel>
-														<StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-															<Border Width="24" Height="24" CornerRadius="12" Background="Yellow" Margin="0,0,5,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Yellow"/>
-															<Border Width="24" Height="24" CornerRadius="12" Background="#34C759" Margin="0,0,5,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Green"/>
-															<Border Width="24" Height="24" CornerRadius="12" Background="#007AFF" Margin="0,0,5,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Blue"/>
-															<Border Width="24" Height="24" CornerRadius="12" Background="#FF3B30" Margin="0,0,10,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Red"/>
-														</StackPanel>
-														<TextBlock Text="Thickness" Foreground="#666666" FontSize="10" Margin="0,0,0,2"/>
-														<Slider Width="140" Minimum="10" Maximum="50" Value="20" ValueChanged="OnSizeChanged" IsMoveToPointEnabled="True"/>
-													</StackPanel>
-												</GroupBox>
-											</ContextMenu>
-										</RadioButton.ContextMenu>
-									</RadioButton>
+                                        <RadioButton.ContextMenu>
+                                            <ContextMenu>
+                                                <GroupBox Header="Highlighter Properties" Padding="10,5" BorderThickness="0" Margin="0">
+                                                    <StackPanel>
+                                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                                            <Border Width="24" Height="24" CornerRadius="12" Background="Yellow" Margin="0,0,5,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Yellow"/>
+                                                            <Border Width="24" Height="24" CornerRadius="12" Background="#34C759" Margin="0,0,5,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Green"/>
+                                                            <Border Width="24" Height="24" CornerRadius="12" Background="#007AFF" Margin="0,0,5,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Blue"/>
+                                                            <Border Width="24" Height="24" CornerRadius="12" Background="#FF3B30" Margin="0,0,10,0" MouseLeftButtonDown="OnColorPicked" Cursor="Hand" ToolTip="Red"/>
+                                                        </StackPanel>
+                                                        <TextBlock Text="Thickness" Style="{StaticResource MenuLabelStyle}"/>
+                                                        <Slider Width="150" Minimum="10" Maximum="50" Value="20" ValueChanged="OnSizeChanged" IsMoveToPointEnabled="True" Margin="0,5"/>
+                                                    </StackPanel>
+                                                </GroupBox>
+                                            </ContextMenu>
+                                        </RadioButton.ContextMenu>
+                                    </RadioButton>
 
-									<RadioButton x:Name="ToolEraser" GroupName="Tools"
-                                                 Click="OnToolChanged" Tag="Eraser"
-                                                 ToolTip="Click again to open settings"
+                                    <RadioButton x:Name="ToolEraser" GroupName="Tools" 
+                                                 Click="OnToolChanged" Tag="Eraser" 
+                                                 ToolTip="Click again to open settings" 
                                                  Style="{StaticResource ToolRadioButtonStyle}">
-										<RadioButton.Content>
-											<StackPanel Orientation="Horizontal">
-												<TextBlock Text="🧹 Eraser"/>
-												<Path Data="M 0,0 L 3,3 L 6,0" Stroke="#999" StrokeThickness="1" Margin="6,4,0,0" VerticalAlignment="Center"/>
-											</StackPanel>
-										</RadioButton.Content>
+                                        <RadioButton.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="🧹 Eraser"/>
+                                                <Path Data="M 0,0 L 3,3 L 6,0" Stroke="#999" StrokeThickness="1" Margin="6,4,0,0" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </RadioButton.Content>
 
-										<RadioButton.ContextMenu>
-											<ContextMenu>
-												<GroupBox Header="Eraser Properties" Padding="5" BorderThickness="0">
-													<StackPanel>
-														<TextBlock Text="Mode" Foreground="#666666" FontSize="10" Margin="0,0,0,5"/>
-														<RadioButton Content="Stroke Eraser (Whole)" GroupName="EraserMenuMode" IsChecked="True" Checked="OnEraserModeRadioChanged" Tag="Stroke" Margin="0,0,0,5"/>
-														<RadioButton Content="Point Eraser (Standard)" GroupName="EraserMenuMode" Checked="OnEraserModeRadioChanged" Tag="Point" Margin="0,0,0,10"/>
+                                        <RadioButton.ContextMenu>
+                                            <ContextMenu>
+                                                <GroupBox Header="Eraser Properties" Padding="10,5" BorderThickness="0" Margin="0">
+                                                    <StackPanel>
+                                                        <TextBlock Text="Mode" Style="{StaticResource MenuLabelStyle}"/>
+                                                        <RadioButton Content="Stroke Eraser (Whole)" GroupName="EraserMenuMode" IsChecked="True" Checked="OnEraserModeRadioChanged" Tag="Stroke" Margin="0,0,0,8" Cursor="Hand"/>
+                                                        <RadioButton Content="Point Eraser (Standard)" GroupName="EraserMenuMode" Checked="OnEraserModeRadioChanged" Tag="Point" Margin="0,0,0,10" Cursor="Hand"/>
 
-														<TextBlock Text="Radius" Foreground="#666666" FontSize="10" Margin="0,0,0,2"/>
-														<Slider x:Name="EraserSizeSlider" Width="140" Minimum="5" Maximum="50" Value="10" ValueChanged="OnEraserSizeChanged" IsMoveToPointEnabled="True"/>
-													</StackPanel>
-												</GroupBox>
-											</ContextMenu>
-										</RadioButton.ContextMenu>
-									</RadioButton>
+                                                        <TextBlock Text="Radius" Style="{StaticResource MenuLabelStyle}"/>
+                                                        <Slider x:Name="EraserSizeSlider" Width="150" Minimum="5" Maximum="50" Value="10" ValueChanged="OnEraserSizeChanged" IsMoveToPointEnabled="True" Margin="0,5"/>
+                                                    </StackPanel>
+                                                </GroupBox>
+                                            </ContextMenu>
+                                        </RadioButton.ContextMenu>
+                                    </RadioButton>
 
-								</StackPanel>
-							</GroupBox>
-						</StackPanel>
-					</ScrollViewer>
-				</TabItem>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
 
-				<TabItem Header="View">
-					<StackPanel Orientation="Horizontal" Margin="10,12" VerticalAlignment="Center">
-						<GroupBox Header="Paper">
-							<StackPanel Orientation="Horizontal">
-								<TextBlock Text="Background:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{StaticResource TextSecondary}"/>
-								<ComboBox Width="140" SelectionChanged="OnPaperStyleChanged" VerticalAlignment="Center" Cursor="Hand" Padding="6">
-									<ComboBoxItem Content="None" Tag="None" IsSelected="True"/>
-									<ComboBoxItem Content="Rule Lines" Tag="Rule"/>
-									<ComboBoxItem Content="Grid Lines" Tag="Grid"/>
-								</ComboBox>
-							</StackPanel>
-						</GroupBox>
-					</StackPanel>
-				</TabItem>
+                <TabItem Header="View">
+                    <StackPanel Orientation="Horizontal" Margin="10,12" VerticalAlignment="Center">
+                        <GroupBox Header="PAPER">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Background:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{StaticResource TextSecondary}"/>
+                                <ComboBox Width="140" SelectionChanged="OnPaperStyleChanged" VerticalAlignment="Center" Cursor="Hand" Padding="6">
+                                    <ComboBoxItem Content="None" Tag="None" IsSelected="True"/>
+                                    <ComboBoxItem Content="Rule Lines" Tag="Rule"/>
+                                    <ComboBoxItem Content="Grid Lines" Tag="Grid"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </TabItem>
 
-			</TabControl>
-		</Border>
+            </TabControl>
+        </Border>
 
-		<ScrollViewer x:Name="MainScrollViewer" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="Transparent" Padding="20">
-			<InkCanvas x:Name="MainInkCanvas" Width="5000" Height="5000" Background="White" Loaded="OnInkCanvasLoaded" MoveEnabled="False">
-				<InkCanvas.Effect>
-					<DropShadowEffect Color="#000000" BlurRadius="20" ShadowDepth="0" Opacity="0.1"/>
-				</InkCanvas.Effect>
-			</InkCanvas>
-		</ScrollViewer>
-	</Grid>
+        <ScrollViewer x:Name="MainScrollViewer" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="Transparent" Padding="20">
+            <InkCanvas x:Name="MainInkCanvas" Width="5000" Height="5000" Background="White" Loaded="OnInkCanvasLoaded" MoveEnabled="False">
+                <InkCanvas.Effect>
+                    <DropShadowEffect Color="#000000" BlurRadius="20" ShadowDepth="0" Opacity="0.1"/>
+                </InkCanvas.Effect>
+            </InkCanvas>
+        </ScrollViewer>
+    </Grid>
 </Window>
